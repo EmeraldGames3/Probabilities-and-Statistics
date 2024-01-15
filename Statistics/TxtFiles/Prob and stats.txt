@@ -1,0 +1,1164 @@
+-------------------------------------Lab1----------------------------------------
+import itertools
+import math
+import random
+
+
+def main():
+    # 2.
+    # a) Man erstelle eine Liste mit den Permutationen von ABC.
+    s = "ABC"
+    permutation_list = list(itertools.permutations(s))
+    print(permutation_list)
+
+    # b) Welches ist die gesamte Anzahl der Permutationen von ABC?
+    print(math.perm(len(s)))
+
+    # c) Man generiere eine zufällige Permutation von MATHE.
+    s = "MATHE"
+    print(random.sample("MATHE", 5))
+
+    # d) Man generiere eine zufällige Variation mit 3 Buchstaben aus dem String MATHE.
+    print(random.sample("MATHE", 3))
+
+    # e) Man generiere alle Variationen (d.h. Anordnungen ohne Wiederholung, mit Berücksichtigung der Reihenfolge)
+    # mit 3 Buchstaben aus dem String MATHE (d.h. alle Variationen je 3 Buchstaben aus dem String MATHE).
+    variations = list(itertools.permutations("MATHE", 3))
+    print(variations)
+
+    # f) Welches ist die gesamte Anzahl der Variationen je 3 Buchstaben von MATHE?
+    print(math.perm(len("ABC"), 3))
+
+    # g) Man generiere alle Kombinationen (d.h. alle Anordnungen ohne Wiederholung, ohne Berücksichtigung der
+    # Reihenfolge) mit 3 Buchstaben aus dem String MATHE (d.h. alle Kombinationen je 3 Buchstaben aus dem String
+    # MATHE).
+    combination = list(itertools.combinations("MATHE", 3))
+    print(combination)
+
+    # h) Welches ist die gesamte Anzahl der Kombinationen je 3 Buchstaben von MATHE?
+    # Hinweis: math.comb
+    print(math.comb(len("MATHE"), 3))
+
+    # Wie viele Möglichkeiten gibt es 6 rote Kugeln in 4 Kartons aufzuteilen? Manche Kartons konnten leer
+    # bleiben. Man zahle alle möglichen Anordnungen auf. Hinweis: Wir bezeichnen die vier Kartons mit 1,2,3,4.
+    # Eine mögliche Anordnung ist: [1,1,2,3,3,3], d.h. 2 Kugeln im Karton ”1”, eine Kugel im Karton ”2”, 3 Kugeln
+    # im Karton ”3” und keine Kugel im Karton ”4”.
+    kartons = [1, 2, 3, 4]
+    kombinationen = itertools.combinations_with_replacement(kartons, 6)
+    n = 0
+    for i in kombinationen:
+        n += 1
+        print(i)
+    print(f"Es gibt {n} Möglichkeiten")
+
+
+if __name__ == '__main__':
+    main()
+-------------------------------------Lab2----------------------------------------
+from math import dist
+
+from matplotlib.patches import Circle
+from matplotlib.pyplot import axis, plot, figure, show, legend, scatter, xlabel, ylabel, title, colorbar
+from numpy import random, unique, square, power, linalg, array
+
+
+def same_birthday():
+    # two people in a group of 23 people have the same birthday
+    birthday_array = random.randint(1, 366, 23)
+    return len(birthday_array) != len(unique(birthday_array))
+
+
+def ex1():
+    # a) Man schatze durch wiederholte Simulationen die Wahrscheinlichkeit von dem Ereignis
+    # A: in einer Gruppe von k = 23 Personen mindestens zwei Personen haben den gleichen Geburtstag.
+    # Annahme: Das Jahr hat n = 365 Tage.
+    positive_outcome = 0
+    tries = 10000
+    for i in range(tries):
+        if same_birthday():
+            positive_outcome += 1
+    return positive_outcome / tries
+
+
+def ex1_theoretic():
+    # Man berechne die theoretische Wahrscheinlichkeit P(A) ?
+    p = 1
+    for i in range(343, 366):
+        p *= i / 365
+    return 1 - p
+
+
+def example():
+    fig = figure()
+    axis("square")
+    axis((0, 1, 0, 1))
+    x = random.random(25)
+    y = random.random(25)
+    plot(x, y, "bo")
+    fig.suptitle("Beispiel 1 ", fontweight="bold")
+    show()
+    fig = figure()
+    axis("square")
+    axis((0, 1, 0, 1))
+    plot(x, square(x), "g*")  # zufallige Punkte auf dem Bild der Funktion F(x)=xˆ2
+    plot(x, power(x, 4), "mo")  # zufallige Punkte auf dem Bild der Funktion F(x)=xˆ4
+    plot(x[-1], square(x[-1]), "g*", label="xˆ2")
+    plot(x[-1], power(x[-1], 4), "mo", label="xˆ4")
+    legend(loc='upper left')
+    fig.suptitle("Beispiel 2 ", fontweight="bold")
+    show()
+
+
+def ex2(n):
+    # Man mochte die Wahrscheinlichkeit schatzen, dass ein zufallig
+    # gewahlter Punkt im Quadrat [0, 1] × [0, 1] sich auch in dem
+    # eingeschriebenen Kreis befindet (siehe Bild).
+
+    # create table
+    fig = figure()
+    axis("square")
+    axis((0, 1, 0, 1))
+
+    # (2a) Man simuliere N zufallige Punkte im Quadrat und man zahle wie viele im Kreisinneren sind; sei k diese
+    # Zahl. Man zeichne auf demselben Bild die zufalligen Punkte mit verschiedenen Farben: diejenigen die im bzw.
+    # die außhalb des Kreisinneren sind. Hinweis: fur die euklidische Distanz zwischen zwei Punkten kann man
+    # math.dist benutzen.
+
+    # generate the coordinates for n points
+    x = random.random(n)
+    y = random.random(n)
+
+    # draw the circle with the center at 0.5, 0.5 and radius of 0.5
+    circle = Circle((0.5, 0.5), 0.5, fill=False, color='r')
+    ax = fig.gca()
+    ax.add_patch(circle)
+
+    # draw them based on their position relative to the circle
+    # count in k how many are inside the circle
+    k = 0
+    for i in range(len(x)):
+        if dist([0.5, 0.5], [x[i], y[i]]) > 0.5:
+            plot(x[i], y[i], "bo")
+        else:
+            plot(x[i], y[i], "ro")
+            k += 1
+
+    # show the table
+    fig.suptitle("Ex 2 ", fontweight="bold")
+    show()
+
+    # (2b) Welches ist die Wahrscheinlichkeit, dass der Punkt im Kreisinneren ist?
+    # [Der theoretische Wert ist π/4, bzw. die Approximation ist k/N]
+    probability = k / n
+    print(f"The probability of a point to bi inside the circle : {probability}")
+
+    # (2c) Anhand von (2a) und (2b) gebe man verschiedene Approximationen von π an.
+    # [Hinweis: π ≈ 4 * k/N]
+    print(f"pi is approx : {4 * probability}")
+
+
+def is_obtuse_triangle(x, y):
+    # Überprüfen, ob das Dreieck mit den Koordinaten x und y einen stumpfen Winkel hat
+    sides = [
+        linalg.norm(x - y),
+        linalg.norm(x),
+        linalg.norm(y)
+    ]
+    sides.sort()
+    return sides[0] ** 2 + sides[1] ** 2 < sides[2] ** 2
+
+
+def ex3(num_simulations):
+    # 3) Im Inneren eines Quadrates mit Seitenlange 1 wahlt man zufallig einen Punkt A. Man verbindet A mit den
+    # Spitzen des Quadrates und man erhalt vier Dreiecke mit gemeinsamer Spitze in A. Anhand von Simulationen
+    # beantworte man folgende Fragen:
+    # (1) Welches ist die Wahrscheinlichkeit, dass genau ein Winkel in A stumpf ist?
+    # (2) Welches ist die Wahrscheinlichkeit, dass genau zwei Winkel in A stumpf sind?
+    # Man zeichne auf demselben Bild die zufalligen Punkte (entsprechend den Fallen (1), (2)) mit verschiedenen Farben.
+
+    # Corners of the square
+    a, b, c, d = [0, 0], [1, 0], [1, 1], [0, 1]
+
+    # Initialize counts for each case
+    count1 = 0  # Count of triangles with exactly one obtuse angle
+    count2 = 0  # Count of triangles with exactly two obtuse angles
+
+    # Initialize plot
+    figure()
+    axis('square')
+    axis((0, 1, 0, 1))
+
+    for _ in range(num_simulations):
+        # Randomly choose a point A inside the unit square
+        x = [random.random(), random.random()]
+
+        # Calculate distances from A to the corners
+        da, db, dc, dd = dist(x, a), dist(x, b), dist(x, c), dist(x, d)
+
+        # Check if each angle in the formed triangles is obtuse
+        angles = [
+            da ** 2 + db ** 2 < 1,
+            db ** 2 + dc ** 2 < 1,
+            dc ** 2 + dd ** 2 < 1,
+            dd ** 2 + da ** 2 < 1
+        ]
+
+        # Count the number of obtuse angles in each case
+        obtuse_count = angles.count(True)
+
+        # Update counts based on the number of obtuse angles
+        if obtuse_count == 1:
+            count1 += 1
+            scatter(x[0], x[1], color='blue')  # Blue for exactly one obtuse angle
+        elif obtuse_count == 2:
+            count2 += 1
+            scatter(x[0], x[1], color='red')  # Red for exactly two obtuse angles
+
+        # Calculate probabilities
+    prob_stumpf_one = count1 / num_simulations
+    prob_stumpf_two = count2 / num_simulations
+
+    # Display probabilities
+    print("Probability of exactly one obtuse angle:", prob_stumpf_one)
+    print("Probability of exactly two obtuse angles:", prob_stumpf_two)
+
+    # Show the plot
+    title('Monte Carlo Simulation for Obtuse Angles')
+    xlabel('X-axis')
+    ylabel('Y-axis')
+    show()
+
+
+def ex4(num_simulations):
+    # Man schreibe ein Programm (in Python), in welchem ein Bild mit N = 500 roten zufalligen Punkten generiert
+    # wird −→ wie im unteren Bild. Man schatze die Wahrscheinlichkeit, dass ein zufallig gewahlter Punkt aus dem
+    # Quadrat sich im Inneren des unteren oder oberen Dreieckes befindet (wie im Bild).
+    points = random.rand(num_simulations, 2)
+
+    # Define the vertices of the upper and lower triangles
+    upper_triangle = array([[0.2, 0.8], [0.8, 0.8], [0.5, 0.5]])
+    lower_triangle = array([[0.2, 0.2], [0.8, 0.2], [0.5, 0.5]])
+
+    # Check if each point is inside the upper or lower triangle
+    inside_upper_triangle = array([is_inside_triangle(p, *upper_triangle) for p in points])
+    inside_lower_triangle = array([is_inside_triangle(p, *lower_triangle) for p in points])
+
+    # Combine the conditions to get points inside either triangle
+    inside_either_triangle = inside_upper_triangle | inside_lower_triangle
+
+    # Calculate the probability of a randomly chosen point being inside either triangle
+    probability_inside_either_triangle = sum(inside_either_triangle) / N
+
+    # Plot the points with different colors for inside and outside the triangles
+    plot_points(points, inside_either_triangle)
+
+    # Display the calculated probability
+    print("Estimated probability of a point being inside either triangle:", probability_inside_either_triangle)
+
+
+def plot_points(points, inside_triangle):
+    figure()
+    scatter(points[:, 0], points[:, 1], c=inside_triangle, cmap='viridis', marker='.')
+    title('Points Inside Either Triangle')
+    xlabel('X-axis')
+    ylabel('Y-axis')
+    colorbar(label='Inside Triangle')
+    show()
+
+
+def is_inside_triangle(p, a, b, c):
+    # Check if point p is inside the triangle defined by vertices a, b, c
+    def sign(p1, p2, p3):
+        return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+
+    d1 = sign(p, a, b)
+    d2 = sign(p, b, c)
+    d3 = sign(p, c, a)
+
+    has_neg = (d1 < 0) or (d2 < 0) or (d3 < 0)
+    has_pos = (d1 > 0) or (d2 > 0) or (d3 > 0)
+
+    return not (has_neg and has_pos)
+
+
+def main():
+    # print(f"ex1 : {ex1()}")
+    # print(f"ex1_theoretic : {ex1_theoretic():.6f}")
+    # example()
+    # ex2(1000)
+    # ex3(1000)
+    ex4(500)
+
+
+if __name__ == '__main__':
+    main()
+-------------------------------------Lab3----------------------------------------
+import random
+from enum import unique
+from math import comb
+
+import numpy
+from matplotlib.pyplot import bar, show, grid, legend, xticks
+from numpy import count_nonzero, unique
+
+
+def ex1_1():
+    # In einer Urne sind 6 rote Kugeln, 4 blaue Kugeln und 6 gr¨une Kugeln. Man zieht 3 Kugeln
+    # hintereinander ohne Zurucklegen. Man betrachtet die Ereignisse:
+    # A:“mindestens eine rote Kugel wurde entnommen”
+    # B:“alle entnommenen Kugeln haben dieselbe Farbe”.
+    # 1) Anhand Simulationen schatze man die Wahrscheinlichkeiten P(A), P(B), P(A ∩ B), P(B|A).
+    num_simulations = 1000
+    red_count = 6
+    blue_count = 4
+    green_count = 6
+    successful_a = 0
+    successful_b = 0
+    successful_ab = 0
+    for _ in range(num_simulations):
+        balls = random.sample(['r', 'b', 'g'], counts=[red_count, blue_count, green_count], k=3)
+        extracted_balls = random.sample(balls, k=3)
+        if 'r' in extracted_balls:
+            successful_a += 1
+
+        if extracted_balls[0] == extracted_balls[1] == extracted_balls[2]:
+            if 'r' in extracted_balls:
+                successful_ab += 1
+            successful_b += 1
+
+    print(f"A: P(A) = {successful_a / num_simulations}")
+    print(f"B: P(B) = {successful_b / num_simulations}")
+    print(f"C: P(A and B) = {successful_ab / num_simulations}")
+    print(f"D: P(B|A)= {(successful_ab / num_simulations) / (successful_a / num_simulations)}")
+
+
+def ex1_2():
+    # 2) Man gebe auch die theoretischen Wahrscheinlichkeiten an f¨ur P(A), P(B), P(A ∩ B), P(B|A).
+    #           not red extracted
+    th_A = 1 - (10 / 16 * 9 / 15 * 8 / 14)
+    #      all red                    all blue                  all green
+    th_B = (6 / 16 * 5 / 15 * 4 / 14) + (4 / 16 * 3 / 15 * 2 / 14) + (6 / 16 * 5 / 15 * 4 / 14)
+    th_AB = 6 / 16 * 5 / 15 * 4 / 14
+    th_BA = th_AB / th_A
+
+    print(f"Theoretical probability P(A) = {th_A}")
+    print(f"Theoretical probability P(B) = {th_B}")
+    print(f"Theoretical probability P(A and B) = {th_AB}")
+    print(f"Theoretical probability P(B|A) = {th_BA}")
+
+
+def ex2():
+    # Beispiel Histogramm - Man zeichne ein Histogramm der relativen Haufigkeiten der Zahlen
+    # die beim 200-maligen Wurfeln erhalten wurden. Was stellt das blau gezeichnete Histogramm dar?
+    # Wie verandert sich das Bild wenn N = 2000?
+    n = 20000
+    data = [random.randrange(1, 7) for _ in range(n)]
+    results, count = numpy.unique(data, return_counts=True)
+    d = dict([(results[i], count[i] / n) for i in range(0, 6)])
+    print(d)
+    bar(results, count / n, width=0.9, color="red", edgecolor="black", label="Relative probability")
+    d = dict([(k, 1 / 6) for k in range(1, 7)])
+    bar(d.keys(), d.values(), width=0.7, color="blue", edgecolor="black", label="Theoretical probability")
+    legend(loc="lower left")
+    xticks(range(0, 7))
+    grid()
+    show()
+
+
+def ex3():
+    # Drei Wurfel werden geworfen. Das Spiel gewinnt derjenige, der die Summe der drei aufgetauchten Zahlen vorhersagt.
+    # (1) Man simuliere dieses Spiel N-mal (=500, 1000...), man erstelle das Histogramm der relativen
+    # Haufigkeiten. Auf demselben Bild zeichne man auch die Balken f¨ur die theoretischen Wahrscheinlichkeiten.
+    # Man vergleiche die theoretischen Ergebnisse mit den erhaltenen Werten aus den Simulationen.
+    simulations_count = 500
+    dice1 = [random.randrange(1, 7) for _ in range(simulations_count)]
+    dice2 = [random.randrange(1, 7) for _ in range(simulations_count)]
+    dice3 = [random.randrange(1, 7) for _ in range(simulations_count)]
+    dice_sums = []
+    # simulate n games
+    for i in range(simulations_count):
+        dice_sums.append(dice1[i] + dice2[i] + dice3[i])
+
+    # print the relative probability
+    results, count = numpy.unique(dice_sums, return_counts=True)
+    relative_probability = dict([(results[i], count[i] / simulations_count) for i in range(len(results))])
+    bar(results, count / simulations_count, width=0.9, color="red", edgecolor="black", label="Relative probability")
+
+    # calculate the theoretical probability
+    dice_sums_theoretical = []
+    for i in [1, 2, 3, 4, 5, 6]:
+        for j in [1, 2, 3, 4, 5, 6]:
+            for k in [1, 2, 3, 4, 5, 6]:
+                dice_sums_theoretical.append(i + j + k)
+
+    results, count = numpy.unique(dice_sums_theoretical, return_counts=True)
+    bar(results, count / (6 * 6 * 6), width=0.7, color="blue", edgecolor="black", label="Theoretical probability")
+
+    # (2) Auf welche Zahl (oder Zahlen) muss man wetten, um die großten Gewinnchancen zu haben?
+    best_choices_relative_array = best_choices(count)
+    print(f"Best relative choice: {best_choices_relative_array}")
+
+    best_choices_theoretical_array = best_choices(count)
+    print(f"Best theoretical choice: {best_choices_theoretical_array}")
+
+    legend(loc="lower left")
+    xticks(range(0, 19))
+    grid()
+    show()
+
+    # (3) Welches ist die theoretische Wahrscheinlichkeit, dass diese Zahl (oder Zahlen) auftaucht? Man
+    # vergleiche das theoretische Resultat mit den erhaltenen Ergebnissen der Simulationen.
+    count_relative = 0
+    dice_sums_unique = unique(dice_sums)
+    for number in best_choices_relative_array:
+        count_relative += count_nonzero(dice_sums_unique == number)
+
+    print(f"Probability of best choice in relative (simulation): {count_relative / len(dice_sums_unique)}")
+
+    count_theoretical = 0
+    dice_sums_theoretical_unique = unique(dice_sums_theoretical)
+    for number in best_choices_theoretical_array:
+        count_theoretical += count_nonzero(dice_sums_theoretical_unique == number)
+
+    print(f"Probability of best choice in theory: {count_theoretical / len(dice_sums_theoretical_unique)}")
+
+
+def best_choices(count):
+    max_count = max(count)
+    max_positions = []
+    for i in range(len(count)):
+        if count[i] == max_count:
+            max_positions.append(i + 3)
+    return max_positions
+
+
+def ex4():
+    # Welche Wahrscheinlichkeiten p1, p2, p3 schatzt folgendes Programm?
+    # Welche sind die theoretischen Werte fur p1, p2, p3?
+    c1, c2, a1, a2 = 0, 0, 0, 0
+    n = 10000
+    a = list(range(1, 21))
+    for _ in range(n):
+        i = numpy.random.randint(len(a))
+        v = a[i]
+        c1 = c1 + (v % 2)
+        c2 = c2 + ((v % 2) == 0)
+        a1 = a1 + (v % 2) * ((v % 3) == 0)
+        a2 = a2 + ((v % 2) == 0) * (6 <= v <= 10)
+    p1 = a1 / c1
+    p2 = a2 / c2
+    p3 = c1 / n
+    print("Aus den Simulationen :")
+    print(f"p1=", p1)
+    print(f"p2=", p2)
+    print(f"p3=", p3)
+
+
+def ex5():
+    # Welche ist die Wahrscheinlichkeit, dass in einer Gruppe von 5 Personen genau zwei Personen
+    # Geburtstag im selben Monat haben und die anderen drei Personen verschiedene Geburtstage haben?
+    # a) Man lose die Aufgabe anhand Simulationen.
+    num_simulations = 100000
+    count_successful = 0  # Zählt die erfolgreichen Simulationen
+    for _ in range(num_simulations):
+        birthdays = [random.randint(1, 12) for _ in range(5)]  # Zufällige Auswahl von Geburtsmonaten
+        # Überprüfen, ob genau zwei Personen im selben Monat Geburtstag haben und die anderen drei verschieden sind
+        if len(birthdays) == len(set(birthdays)) + 1:
+            count_successful += 1
+    probability = count_successful / num_simulations
+    print(f"Simulierte Wahrscheinlichkeit: {probability}")
+
+    # b) Man gebe die theoretische Wahrscheinlichkeit an. Annahme:
+    # die Wahrscheinlichkeit, dass eine zufallig gewahlte Person Geburtstag in einem bestimmten Monat hat ist 1/12
+    total_outcomes = 12 ** 5
+    ways_two_shared = comb(5, 2)
+    ways_remaining = 11 * 10 * 9
+    probability = ways_two_shared * ways_remaining / total_outcomes
+    print(f"Thoretical probability: {probability}")
+
+
+def ex6():
+    # Man schatze anhand Simulationen die Wahrscheinlichkeit, dass beim zweimaligen Werfen eines
+    # Wurfels die Summe der Zahlen mindestens 7 ist (Summe ≥ 7),
+    # a) unter der Bedingung, dass beim ersten Wurf eine 4 erhalten wurde;\
+    num_simulations = 100000
+    count_successful = 0
+    for _ in range(num_simulations):
+        first_throw = 4
+        second_throw = random.randint(1, 6)
+        if first_throw + second_throw >= 7:
+            count_successful += 1
+    probability = count_successful / num_simulations
+    print(f"Simulierte Wahrscheinlichkeit unter Bedingung a): {probability}")
+
+    # b) unter der Bedingung, dass beim zweiten Wurf eine gerade Zahl erhalten wurde.
+    num_simulations = 100000
+    count_successful = 0
+    for _ in range(num_simulations):
+        first_throw = random.randint(1, 6)
+        second_throw = random.choice([2, 4, 6])
+        if first_throw + second_throw >= 7:
+            count_successful += 1
+    probability = count_successful / num_simulations
+    print(f"Simulierte Wahrscheinlichkeit unter Bedingung b): {probability}")
+
+    # c) Welche sind die theoretischen Wahrscheinlichkeiten bei a), bzw. b) ?
+    # a) begins with 4 => 3, 4, 5 or 6 are needed => probability = 4/6
+    # b) case 1: 2 => 5, 6              => 2/6
+    #    case 2: 4 => 3, 4, 5, 6        => 4/6      => probability = 2/6 + 4/6 + 6/6
+    #    case 3: 6 => 1, 2, 3, 4, 5, 6  => 6/6
+
+
+def main():
+    # ex1_1()
+    # ex1_2()
+    # ex2()
+    # ex3()
+    # ex4()
+    # ex5()
+    ex6()
+
+
+if __name__ == "__main__":
+    main()
+-------------------------------------Lab4----------------------------------------
+import numpy
+from matplotlib.pyplot import grid, xticks, show, ylabel, xlabel, title, hist, bar, legend
+from numpy import random, argmax, array, mean, arange
+from scipy.stats import binom
+
+
+def ex1():
+    # Generieren von zufalligen Werten der ZG: X ∼ /0   1   3   5  \
+    #                                              \0.4 0.1 0.3 0.2/
+    # Simulation von zufalligen Werten fur X in Python:
+    n = 1000
+    x = [0, 1, 3, 5]
+    p = [0.4, 0.1, 0.3, 0.2]
+    rng = numpy.random.default_rng()
+    data = rng.choice(x, size=n, replace=True, p=p)
+    results, count = numpy.unique(data, return_counts=True)
+
+    # Man erstelle das Histogramm der relativen Haufigkeiten fur 1000 zufallige Werte von X. Auf demselben Bild
+    # zeichne man auch die Balken fur die theoretischen Wahrscheinlichkeiten.
+    bar(results, count / n, width=0.9, color="red", edgecolor="black", alpha=0.4, label="Relative probability")
+    bar(x, p, width=0.7, color="blue", edgecolor="black", alpha=0.5, label="Theoretical probability")
+    legend(loc="lower left")
+    xticks(range(min(x), max(x) + 1))
+    grid()
+    show()
+
+
+def ex2():
+    # Uber die Zufallsgroße X ist Anzahl von Fehlern in den online Artikeln einer bestimmten Zeitung ist bekannt:
+    # in 25% der Artikeln sind keine Tippfehler, in 35% der Artikel ist ein Tippfehler, in 25% der Artikel sind zwei, in
+    # 10% drei und auf dem Rest vier Tippfehler.
+    # a) Man generiere zufallige Werte fur X.
+    simulations = 1000
+    errors = [0, 1, 2, 3, 4]
+    probability = [0.25, 0.35, 0.25, 0.10, 0.05]
+    rng = numpy.random.default_rng()
+    data = rng.choice(errors, size=simulations, replace=True, p=probability)
+    values, count = numpy.unique(data, return_counts=True)
+
+    # b) Man schatze anhand der Simulationen die Wahrscheinlichkeit, dass hochstens 1 Tippfehler in einem zufallig
+    # gewahlten Artikel auftaucht.
+    print(f"Probability of max 1 error: {(count[0] + count[1]) / simulations}")
+
+    # c) Wie viele Tippfehler sind durchschnittlich (im Mittel) in einem online Artikel dieser Zeitung zu erwarten, d.h.
+    # man verlangt die Schatzung von dem Erwartungswert E(X). Man berechne den theoretischen Erwartungswert.
+    print(f"Average error count: {numpy.mean(data)}")
+    print(f"Theoretical average error count: {sum(x * p for x, p in zip(errors, probability))}")
+
+
+def ex3():
+    n = 1000
+    max_value = 8
+    probability = 0.5
+    all_values = []
+
+    for i in range(max_value + 1):
+        all_values.append(i)
+
+    x = binom.rvs(max_value, probability, size=n)
+    w = binom.pmf(all_values, max_value, probability)
+
+    bar(all_values, w, width=0.9, color="red", edgecolor="black", label="Theor. Haufigkeiten ")
+    xticks(range(0, max_value + 1))
+
+    xx, count = numpy.unique(x, return_counts=True)
+    bar(xx, count / n, width=0.6, color="blue", edgecolor="black", label="Rel. Haufigkeiten ")
+
+    legend(loc="upper right")
+
+    grid()
+    show()
+
+
+def ex4():
+    # In einem Computerpool sind 7 Rechner. Die Wahrscheinlichkeit, dass ein neuer Virus
+    # einen Rechner angreift ist 0.4, unabhangig von anderen Rechnern.
+    #
+    # Man gebe die Antworten anhand Simulationen (binom.rvs) und vergleiche diese mit den theoretischen
+    # Wahrscheinlichkeiten (hierfur benutze man binom.cdf, binom.pmf).
+
+    simulations = 1000
+    nr_computers = 7
+    probability = 0.4
+    values_sim = binom.rvs(nr_computers, probability, size=simulations)
+
+    # Welche ist die Wahrscheinlichkeit, dass der Virus:
+    # a) hochstens 3 Rechner
+    count = 0
+    for value in values_sim:
+        if value <= 3:
+            count += 1
+    print(f"Max 3 computers (simulation): {count / simulations}")
+    theoretical = binom.cdf(3, nr_computers, probability)
+    print(f"Theoretical: {theoretical:.3f}")
+
+    # b) mindestens 4 Rechner
+    count = 0
+    for value in values_sim:
+        if value >= 4:
+            count += 1
+    print(f"Min 4 computers (simulation): {count / simulations}")
+    theoretical = 1 - binom.cdf(3, nr_computers, probability)
+    print(f"Theoretical: {theoretical:.3f}")
+
+    # c) genau 4 Rechner angreift?
+    count = 0
+    for value in values_sim:
+        if value == 4:
+            count += 1
+    print(f"Genau 4 computers (simulation): {count / simulations}")
+    theoretical = binom.pmf(4, nr_computers, probability)
+    print(f"Theoretical: {theoretical:.3f}")
+
+
+def ex5():
+    # Anzahl der Simulationen
+    num_simulations = 500
+
+    results = []
+    for _ in range(num_simulations):
+        generated_numbers = random.choice(arange(1, 6), size=1000, p=[1 / 5] * 5)
+        # Suche nach der Position der ersten 5 in den generierten Zahlen
+        first_occurrence_index = argmax(generated_numbers == 5)
+        # Anzahl der generierten Zahlen vor der ersten 5
+        x = first_occurrence_index + 1
+        results.append(x)
+
+    hist(results, bins=arange(1, max(results) + 2) - 0.5, density=True, edgecolor='black')
+    title('Histogram of X: Number of Generated Numbers before First 5')
+    xlabel('X')
+    ylabel('Probability')
+    show()
+
+    # P(X ≤ 3)
+    probability_x_leq_3 = mean(array(results) <= 3)
+    # P(X > 3)
+    probability_x_gt_3 = mean(array(results) > 3)
+    # Erwartungswert E(X)
+    expectation_x = mean(results)
+    # Schätzung durchführen
+    # Ergebnisse ausgeben
+    print(f"Estimated Probability P(X <= 3): {probability_x_leq_3}")
+    print(f"Estimated Probability P(X > 3): {probability_x_gt_3}")
+    print(f"Estimated Expectation E(X): {expectation_x}")
+
+
+def main():
+    ex1()
+    ex2()
+    ex3()
+    ex4()
+    ex5()
+
+
+if __name__ == "__main__":
+    main()
+-------------------------------------Lab5----------------------------------------
+import random
+
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import norm, expon, uniform
+
+
+def ex1():
+    # Teepackungen, die von einer bestimmten Firma abgefullt werden, sollten mit jeweils 200 g Inhalt
+    # abgefullt werden. Die abgefullte Menge Tee X in einer Packung ist normal verteilt X ∼ N(µ, σ^2); die dafur
+    # zustandige Abfullmaschine hat eine Standardabweichung von σ = 3 g und ist auf einen Erwartungswert
+    # µ = 199 g eingestellt
+    # a) Anhand 1000 simulierten Daten, welche ist im Mittel die abgefullte Menge Tee in einer Packung?
+    mu = 199
+    sigma = 3
+    n = 10000
+    data = norm.rvs(mu, sigma, n)
+    average = np.mean(data)
+    print("Average:", average)
+
+    # b)
+    # Mit welcher Wahrscheinlichkeit werden in einer Packung weniger als 195 g Tee abgefullt?
+    # Mit welcher Wahrscheinlichkeit werden in einer Packung zwischen 195 g und 198 g Tee abgefullt?
+    # Mit welcher Wahrscheinlichkeit werden in einer Packung mehr als 195 g Tee abgefullt?
+    print(f"Probability to have less than 195 g: {sum(data <= 195) / n}")
+    print(f"Probability to have between 195 and 198 g: {np.mean((data >= 195) * (data <= 198)) / n}")
+    print(f"Probability to have more than 195 g: {sum(data > 195) / n}")
+
+    # Man vergleiche das Ergebnis mit den theoretischen Wahrscheinlichkeiten.
+    print(f"The probability to have less than 195 g is: {norm.cdf(195, mu, sigma)}")
+    print(f"The probability to have between 195 and 198 g is: {norm.cdf(198, mu, sigma) - norm.cdf(195, mu, sigma)}")
+    print(f"The probability to have more than 195 g is: {1 - norm.cdf(195, mu, sigma)}")
+
+    # c) Die generierten Daten der Stichprobe sollen in 16 Klassen (Intervallen) eingeteilt.
+    # Man zahle mit Hfg, Klasse=numpy.histogram(Daten, bins=16) und gebe an (mit print) wie viele Daten in jeder
+    # Klasse sind.
+    hfg, klasse = np.histogram(data, bins=16)
+    print("Histogram:")
+    for i, (count, interval) in enumerate(zip(hfg, klasse)):
+        print(f"({i + 1}) absolute Hfg. {count} der Klasse {interval}")
+
+    # Man zeichne das entsprechende Histogramm der relativen Haufigkeiten mit
+    # matplotlib.pyplot.hist(Daten,bins=16,density=True, edgecolor="black", label="rel. Hfg.")
+    # Auf demselben Bild zeichne man auch die Dichtefunktion der N(µ, σ^2) Verteilung (µ = 199, σ = 3).
+    # Hinweis: Man benutze scipy.stats.norm.pdf(x, µ, σ)) und plot.
+    plt.hist(data, bins=16, density=True, edgecolor="black", label="rel. Hfg.")
+    x = np.linspace(min(data), max(data), 100)
+    pdf_values = norm.pdf(x, mu, sigma)
+    plt.plot(x, pdf_values)
+    plt.show()
+
+
+def ex2():
+    # Die Zeit T (in Sekunden), die ein Drucker benotigt, um ein Werbeplakat zu drucken, folgt einer
+    # Exponentialverteilung Exp(α) mit dem Parameter α = 1/12
+
+    # a) Man simuliere N = 1000 Daten fur eine Stichprobe.
+    # Welche ist die durchschnittliche Druckzeit fur das Drucken eines Plakats?
+    n = 1000
+    alpha = 1 / 12
+    data = expon.rvs(loc=0, scale=1 / alpha, size=n)
+    mean = np.mean(data)
+    print("Mean is: ", mean)
+
+    # b) Man zeichne ein Histogramm mit 12 Klassen fur die simulierten Daten und auf demselben Bild zeichne
+    # man die Dichtefunktion scipy.stats.expon.pdf(x,loc=0,scale=1/alpha).
+    hist, bins, _ = plt.hist(data, bins=12, density=True, edgecolor='black', label='Histogram')
+    x = np.linspace(min(bins), max(bins), 1000)
+    pdf_values = expon.pdf(x, loc=0, scale=1 / alpha)
+    plt.plot(x, pdf_values, label='Exponential PDF')
+    plt.title('Histogram and Exponential PDF of Print Time')
+    plt.xlabel('Print Time (seconds)')
+    plt.ylabel('Probability Density')
+    plt.legend()
+    plt.show()
+    # Additional part for printing class information
+    hfg, klassen = np.histogram(data, bins=12)
+    for i in range(len(hfg)):
+        print(f"Klasse {i + 1:2d}: {hfg[i]:3d} Daten, [{bins[i]:8.4f}, {bins[i + 1]:8.4f}]")
+
+    # c) Man schatze danach die Wahrscheinlichkeiten P(T < 20), P(T > 10), P(10 < T < 30).
+    probability_less_than_20 = np.mean(data < 20)
+    probability_greater_than_10 = np.mean(data > 10)
+    probability_between_10_and_30 = np.mean((data > 10) & (data < 30))
+
+    # Man vergleiche das Ergebnis mit den theoretischen Wahrscheinlichkeiten, welche man mit
+    # scipy.stats.expon.cdf(x,loc=0,scale=1/alpha) berechnet.
+    theoretical_probability_less_than_20 = expon.cdf(20, loc=0, scale=1 / alpha)
+    theoretical_probability_greater_than_10 = 1 - expon.cdf(10, loc=0, scale=1 / alpha)
+    theoretical_probability_between_10_and_30 = expon.cdf(30, loc=0, scale=1 / alpha) - expon.cdf(10, loc=0,
+                                                                                                  scale=1 / alpha)
+
+    print(f"Estimated Probability T < 20: {probability_less_than_20}")
+    print(f"Theoretical Probability T < 20: {theoretical_probability_less_than_20}\n")
+
+    print(f"Estimated Probability T > 10: {probability_greater_than_10}")
+    print(f"Theoretical Probability T > 10: {theoretical_probability_greater_than_10}\n")
+
+    print(f"Estimated Probability 10 < T < 30: {probability_between_10_and_30}")
+    print(f"Theoretical Probability 10 < T < 30: {theoretical_probability_between_10_and_30}")
+
+    # d) Die generierten Daten der Stichprobe wurden in 12 Klassen (Intervallen) eingeteilt. Man zahle und
+    # gebe an wie viele Daten in jeder Klasse sind, und man zeichne auf einem neuen Bild das entsprechende
+    # Histogramm der absoluten Haufigkeiten.
+    # matplotlib.pyplot.hist(Daten,bins=12,density=False,edgecolor="black",label="absolute Hfg.")
+    absolute_hfg, bins = np.histogram(data, bins=12)
+
+    # Print the counts in each class
+    for i in range(len(absolute_hfg)):
+        print(f"Klasse {i + 1:2d}: {absolute_hfg[i]:3d} Daten, [{bins[i]:8.4f}, {bins[i + 1]:8.4f}]")
+
+    # Draw the histogram of absolute frequencies
+    plt.hist(data, bins=12, density=False, edgecolor="black", label="absolute Hfg.")
+    plt.xlabel('T')
+    plt.ylabel('Absolute Frequency')
+    plt.title('Histogram of Absolute Frequencies')
+    plt.legend()
+    plt.show()
+
+    # e) Auf einem anderen Bild zeichne man auf dem Intervall [0, 10] die Dichtefunktion der Exp(1) Verteilung.
+    # Generate x values for the plot
+    x_values = np.linspace(0, 10, 100)
+
+    # Calculate the corresponding y values using the density function of Exp(1)
+    y_values = expon.pdf(x_values, loc=0, scale=1)
+
+    # Plot the density function
+    plt.plot(x_values, y_values, 'r-', label='Density Function (Exp(1))')
+
+    # Set plot labels and title
+    plt.xlabel('T')
+    plt.ylabel('Density')
+    plt.title('Density Function of Exp(1) Distribution')
+    plt.legend()
+    plt.show()
+
+
+def ex3():
+    num_simulations = 1000
+    total_profit = 0
+    total_wins = 0
+    for _ in range(num_simulations):
+        birthdays = [np.random.randint(1, 13) for _ in range(6)]
+        if len(birthdays) != len(set(birthdays)):
+            total_wins += 1
+            total_profit += 6
+        else:
+            total_profit -= 6
+    avg_profit = total_profit / num_simulations
+    win_probability = total_wins / num_simulations
+    print(f"Average Profit: {avg_profit}")
+    print(f"Win probability: {win_probability}")
+
+
+def ex4():
+    # In einer Urne sind 4 weiße und 6 schwarze Kugeln. Ein Spieler zieht nacheinander eine Kugel
+    # ohne Zurucklegen. Das Spiel ist aus, wenn er eine weisse Kugel zieht oder wenn er dreimal gezogen hat.
+    # Die Zufallsvariable X zeigt die Anzahl der gezogenen schwarzen Kugeln.
+    # a) Welches ist die (theoretische) Wahrscheinlichkeitsverteilung von X und simuliere zufallige Werte fur X.
+    # b) Der Spieler erhalt 30 Punkte, wenn er drei schwarze Kugeln gezogen hat. Er erhalt 25 Punkte, wenn er
+    # zwei schwarze Kugeln zieht. In allen anderen Fallen verliert er 5 Punkte. Anhand Simulationen schatze
+    # man die mittlere Punktezahl des Spielers. Man vergleiche das Ergebnis mit dem theoretischen Ergebnis.
+    print("Theoretische:")
+    print(f"P(X = 0) = P(erste Kugel ist weiß) = {4 / 10}")
+    print(f"P(X = 1) = P(erste Kugel schwarz, zweite Kugel weiß) = {6 / 10 * 4 / 9}")
+    print(f"P(X = 2) = P(erste und zweite Kugel schwarz, dritte Kugel weiß) = {6 / 10 * 5 / 9 * 4 / 8}")
+    print(f"P(X = 3) = P(erste und zweite und dritte Kugel schwarz) = {6 / 10 * 5 / 9 * 4 / 8}")
+
+    num_simulations = 1000
+    count_black_0 = 0
+    count_black_1 = 0
+    count_black_2 = 0
+    count_black_3 = 0
+    score = 0
+    for _ in range(num_simulations):
+        balls = random.sample(['w', 's'], counts=[4, 6], k=3)
+        if balls[0] == 'w':
+            count_black_0 += 1
+            score -= 5
+        elif balls[1] == 'w':
+            count_black_1 += 1
+            score -= 5
+        elif balls[2] == 'w':
+            count_black_2 += 1
+            score += 25
+        else:
+            count_black_3 += 1
+            score += 30
+    print("Relative:")
+    print(f"P(X = 0) = P(erste Kugel ist weiß) = {count_black_0 / num_simulations:.2f}")
+    print(f"P(X = 1) = P(erste Kugel schwarz, zweite Kugel weiß) = {count_black_1 / num_simulations:.2f}")
+    print(f"P(X = 2) = P(erste und zweite Kugel schwarz, dritte Kugel weiß) = {count_black_2 / num_simulations:.2f}")
+    print(f"P(X = 3) = P(erste und zweite und dritte Kugel schwarz) = {count_black_3 / num_simulations:.2f}")
+
+    print(f"P(Y = 30) = {count_black_3 / num_simulations:.2f}")
+    print(f"P(Y = 25) = {count_black_2 / num_simulations:.2f}")
+    print(f"P(Y = -5) = {(count_black_0 + count_black_1) / num_simulations:.2f}")
+    print(f"E(Y) = Average score: {score / num_simulations}")
+
+
+def ex5():
+    # Man simuliere mit Hilfe von scipy.stats.uniform.rvs 1000 zuf¨allige Punkte aus dem Quader
+    # [−1, 1] × [−1, 1] × [−1, 1] ⊂ R^3
+    # Sei D die ZG welche Distanz dieser Punkte zum Ursprung (0,0,0) darstellt.
+    # Man schatze den Erwartungswert (numpy.mean) und die Varianz von D (numpy.var).
+    num_points = 1000
+    # Generate random points in the cube [-1, 1] × [-1, 1] × [-1, 1]
+    points = uniform.rvs(loc=-1, scale=2, size=(num_points, 3))
+    # Calculate the distance to the origin for each point
+    distances = np.linalg.norm(points, axis=1)
+    # Calculate the mean and variance of distances
+    mean_distance = np.mean(distances)
+    variance_distance = np.var(distances)
+    print(f"Estimated Mean Distance: {mean_distance:.4f}")
+    print(f"Estimated Variance of Distance: {variance_distance:.4f}")
+
+
+def main():
+    # ex1()
+    # ex2()
+    # ex3()
+    # ex4()
+    ex5()
+
+
+if __name__ == "__main__":
+    main()
+-------------------------------------Lab6----------------------------------------
+import math
+import random
+from itertools import product
+
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import expon, uniform
+
+
+def ex1():
+    n = 800
+    x = [4, 5, 6, 7, 8, 9, 10]
+    p = [0.05, 0.1, 0.1, 0.35, 0.2, 0.1, 0.1]
+
+    d = random.choices(x, weights=p, k=n)
+
+    # Calculate the expected value
+    expected_value = np.mean(d)
+    print("Expected value E(X):", expected_value)
+
+    # Theoretical Expected value E(X)
+    expected_value = sum(x * p for x, p in zip(x, p))
+    print("Theoretical Expected value E(X):", expected_value)
+
+    # Calculate the variance
+    variance = np.var(d)
+    print("Variance V(X):", variance)
+
+    # Theoretical Variance V(X)
+    expected_value_squared = sum(x ** 2 * p for x, p in zip(x, p))
+    variance = expected_value_squared - expected_value ** 2
+    print("Theoretical Variance V(X):", variance)
+
+    # Calculate the probability P(X ≤ 7)
+    prob_x_leq_7 = sum(1 for d in d if d <= 7) / n
+    print("P(X ≤ 7):", prob_x_leq_7)
+
+    # Theoretical Probability P(X ≤ 7)
+    prob_x_leq_7 = sum(p for x, p in zip(x, p) if x <= 7)
+    print("Theoretical P(X ≤ 7):", prob_x_leq_7)
+
+    # Calculate the probability P(X > 4)
+    prob_x_gt_4 = sum(1 for d in d if d > 4) / n
+    print("P(X > 4):", prob_x_gt_4)
+
+    # Theoretical Probability P(X > 4)
+    prob_x_gt_4 = sum(p for x, p in zip(x, p) if x > 4)
+    print("Theoretical P(X > 4):", prob_x_gt_4)
+
+    plt.subplot(1, 2, 1)
+    plt.hist(d, bins=len(x), density=True, edgecolor='black')
+    plt.title('Relativen Häufigkeiten')
+    plt.xlabel('Werte')
+    plt.ylabel('Relative Häufigkeit')
+
+    # Absolute Häufigkeiten
+    plt.subplot(1, 2, 2)
+    plt.hist(d, bins=len(x), density=False, edgecolor='black', color='r')
+    plt.title('Absoluten Häufigkeiten')
+    plt.xlabel('Werte')
+    plt.ylabel('Absolute Häufigkeit')
+
+    plt.tight_layout()
+    plt.show()
+
+
+def ex2():
+    n = 1000
+    x_min = y_min = z_min = -2
+    x_max = y_max = z_max = 2
+    target_point = (2, 2, 2)
+
+    # a
+    points = [(random.uniform(x_min, x_max), random.uniform(y_min, y_max), random.uniform(z_min, z_max)) for _ in
+              range(n)]
+    distances = [math.dist(point, target_point) for point in points]
+    expected_value_x = sum(distances) / n
+    print("Estimation of the expected value of X: ", expected_value_x)
+
+    # b
+    center = (0, 0, 0)
+    distances = [math.dist(point, center) for point in points]
+    inside_points = 0
+    for distance in distances:
+        if distance <= 2:
+            inside_points += 1
+    probability = inside_points / n
+    print("Probability of a point being inside the sphere: ", probability)
+
+    theoretical_probability = (4 / 3 * math.pi * 8) / 64
+    print("Theoretical probability", theoretical_probability)
+
+
+def ex3():
+    prob_D1 = 0.4
+    prob_D2 = 0.6
+
+    printing_time_D1 = expon(scale=1 / 5)
+    printing_time_D2 = uniform(loc=4, scale=2)
+
+    n = 10000
+    print_times = np.zeros(n)
+
+    for i in range(n):
+        chosen_printer = np.random.choice(['D1', 'D2'], p=[prob_D1, prob_D2])
+
+        if chosen_printer == 'D1':
+            print_times[i] = printing_time_D1.rvs()
+        else:
+            print_times[i] = printing_time_D2.rvs()
+
+    probability_more_than_5_seconds = np.mean(print_times > 5)
+
+    mean_printing_time = np.mean(print_times)
+    std_printing_time = np.std(print_times)
+
+    print(f"a) Estimated probability of printing taking more than 5 seconds: {probability_more_than_5_seconds:.4f}")
+    print(f"b) Estimated mean printing time: {mean_printing_time:.2f} seconds")
+    print(f"   Estimated standard deviation of printing time: {std_printing_time:.2f} seconds")
+
+
+def ex4():
+    # Sei die Gleichung zweiten Grades x^2 + Bx + C = 0, wobei B, C ∼ Unif[−1, 1] unabhangige ZG sind.
+    # Anzahl der Simulationen
+    num_simulations = 10000
+
+    # Zufallsvariablen B und C
+    B_values = uniform.rvs(loc=-1, scale=2, size=num_simulations)
+    C_values = uniform.rvs(loc=-1, scale=2, size=num_simulations)
+
+    # a) die Wahrscheinlichkeit, dass beide Wurzeln der Gleichung reell sind;
+    real_roots = []
+    for i in range(num_simulations):
+        if B_values[i] ** 2 - 4 * C_values[i] >= 0:
+            real_roots.append(
+                (((-B_values[i] + np.sqrt(B_values[i] ** 2 - 4 * C_values[i])) / 2),
+                 ((-B_values[i] - np.sqrt(B_values[i] ** 2 - 4 * C_values[i])) / 2))
+            )
+    prob_real_roots = len(real_roots) / num_simulations
+    print(f"a) Wahrscheinlichkeit, dass beide Wurzeln reell sind: {prob_real_roots:.4f}")
+
+    # b) die Wahrscheinlichkeit, dass beide Wurzeln der Gleichung positiv sind;
+    num_pos_roots = 0
+    for i in range(len(real_roots)):
+        if real_roots[i][0] >= 0 and real_roots[i][1] >= 0:
+            num_pos_roots += 1
+    prob_positive_roots = num_pos_roots / num_simulations
+    print(f"b) Wahrscheinlichkeit, dass beide Wurzeln positiv sind: {prob_positive_roots:.4f}")
+
+    # c) den Erwartungswert und die Varianz der Summe der beiden Wurzeln.
+    sum_roots = []
+    for i in range(len(real_roots)):
+        sum_roots.append(real_roots[i][0] + real_roots[i][1])
+    expected_value = np.mean(sum_roots)
+    variance = np.var(sum_roots)
+    print(f"c) Erwartungswert der Summe der Wurzeln: {expected_value:.4f}")
+    print(f"   Varianz der Summe der Wurzeln: {variance:.4f}")
+
+
+def ex5():
+    # In einer Urne sind 20 rote Kugeln, 15 blaue Kugeln, 5 grune Kugeln und 10 schwarze Kugeln. Man
+    # simuliere N(= 200, 1000, . . .) Ziehungen mit Zurucklegen und zeige (print) die relative Haufigkeit an mit
+    # welcher jede Farbe auftaucht. Man vergleiche die theoretischen Resultate mit den Ergebnissen aus den
+    # Simulationen. Man gebe die Ergebnisse der ersten 10 Ziehungen an!
+    n = 1000
+    count_red = 0
+    count_green = 0
+    count_blue = 0
+    count_black = 0
+    for _ in range(n):
+        urn = np.array(['red'] * 20 + ['blue'] * 15 + ['green'] * 5 + ['black'] * 10)
+        draws = np.random.choice(urn, size=10, replace=True)
+        for draw in draws:
+            if draw == 'red':
+                count_red += 1
+            elif draw == 'blue':
+                count_blue += 1
+            elif draw == 'green':
+                count_green += 1
+            else:
+                count_black += 1
+
+    print(f"P(rot) = {count_red / (n * 10)}")
+    print(f"P(blau) = {count_blue / (n * 10)}")
+    print(f"P(grun) = {count_green / (n * 10)}")
+    print(f"P(schwarz) = {count_black / (n * 10)}")
+
+    total_balls = 20 + 15 + 5 + 10
+    prob_red = 20 / total_balls
+    prob_blue = 15 / total_balls
+    prob_green = 5 / total_balls
+    prob_black = 10 / total_balls
+    print(f"Theoretische Wahrscheinlichkeiten:")
+    print(f"P(rot) = {prob_red}")
+    print(f"P(blau) = {prob_blue}")
+    print(f"P(grun) = {prob_green}")
+    print(f"P(schwarz) = {prob_black}")
+
+
+def ex6():
+    # Eine Urne enthalt 10 Kugeln mit der Ziffer 0, 20 Kugeln mit der Ziffer 1, 20 Kugeln mit der Ziffer 2.
+    # Aus der Urne werden 3 Kugeln ohne Zurucklegen gezogen. X sei das Produkt der 3 erhaltenen Zahlen.
+    # Man schatze anhand Simulationen den Erwartungswert und die Varianz von X!
+    # Man erstelle anhand Simulationen das Histogramm der absoluten Haufigkeiten fur die Werte von X!
+    # In ein zweites Bild zeichne man ein zweites Histogramm mit den (theoretischen) Wahrscheinlichkeiten der ZG X.
+    n = 10000
+    urne = [0, 1, 2]
+    counts = [10, 20, 20]
+    simulated_values = []
+    for _ in range(n):
+        draws = random.sample(urne, counts=counts, k=3)
+        product_value = np.prod(draws)
+        simulated_values.append(product_value)
+
+    # Berechne Erwartungswert und Varianz
+    mean_value = np.mean(simulated_values)
+    variance_value = np.var(simulated_values)
+    print(f"Erwartungswert von X: {mean_value}")
+    print(f"Varianz von X: {variance_value}")
+
+    # Histogramm der absoluten Häufigkeiten
+    plt.hist(simulated_values, bins=np.arange(min(simulated_values), max(simulated_values) + 2) - 0.5, density=False,
+             edgecolor="black", label="absolute Hfg.")
+    plt.title('Histogramm der absoluten Haufigkeiten')
+    plt.xlabel('X')
+    plt.ylabel('Absolute Haufigkeit')
+    plt.show()
+
+    # Histogramm mit theoretischen Wahrscheinlichkeiten
+    all_possible_outcomes = list(product(urne, repeat=3))
+    theoretical_probabilities = [counts[0] / sum(counts) * counts[1] / sum(counts) * counts[2] / sum(counts) for _ in
+                                 all_possible_outcomes]
+
+    plt.hist(simulated_values, bins=np.arange(min(simulated_values), max(simulated_values) + 2) - 0.5, density=True,
+             edgecolor="black", label="relative Hfg.")
+    # plt.plot(theoretical_probabilities, bins=np.arange(min(simulated_values), max(simulated_values) + 2) - 0.5,
+    #          density=True, label="theoretische Wahrscheinlichkeiten")
+    plt.title('Histogramm mit theoretischen Wahrscheinlichkeiten')
+    plt.xlabel('X')
+    plt.ylabel('Relative Haufigkeit')
+    plt.legend()
+    plt.show()
+
+
+def main():
+    # ex1()
+    # ex2()
+    # ex3()
+    # ex4()
+    # ex5()
+    ex6()
+
+
+if __name__ == "__main__":
+    main()

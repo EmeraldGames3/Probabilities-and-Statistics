@@ -1,0 +1,524 @@
+-------------------------------------EX1----------------------------------------------
+import numpy as np
+
+num_simulations = 1000
+num_games = 10
+total_wins = 0
+
+for _ in range(num_simulations):
+    current_wins = 0
+    for _ in range(num_games):
+        x = np.random.randint(1, 38)
+        if x == 15:
+            current_wins += 175
+        else:
+            current_wins -= 5
+    total_wins += current_wins
+
+print(f"Average wins in {num_simulations} simulations: {total_wins / num_simulations}")
+-------------------------------------EX2----------------------------------------------
+import numpy as np
+from scipy.stats import binom
+
+prob_no_defect = 0.80
+prob_light_defect = 0.15
+prob_big_defect = 0.05
+
+# a) Man simuliere N=100 mögliche Werte der ZG X.
+num_simulations = 100
+num_products = 100
+big_defects = []
+for _ in range(num_simulations):
+    simulated_data = np.random.choice(["no_defect", "light_defect", "big_defect"], size=num_products, replace=True,
+                                      p=[prob_no_defect, prob_light_defect, prob_big_defect])
+    big_defects.append(np.sum(simulated_data == "big_defect"))
+print(f"{num_simulations} simulations and their number of big_defects priducts:\n", big_defects)
+
+# b) Welches ist die mittlere Anzahl M der Waren mit großen Fehlern (anhand der simulierten Daten)?
+num_big_defect = 0
+for _ in range(num_simulations):
+    simulated_data = np.random.choice(["no_defect", "light_defect", "big_defect"], size=num_products, replace=True,
+                                      p=[prob_no_defect, prob_light_defect, prob_big_defect])
+    num_big_defect += np.sum(simulated_data == "big_defect")
+print("Average number of big defects: ", num_big_defect / num_simulations)
+
+# c) Wie groß ist die theoretische Wahrscheinlichkeit, dass von den nächsten hergestellten 100 Exemplaren dieser Ware
+# 1) höchstens 3; 2) genau 10; 3) mindestens 4 große Fehler besitzen?
+print(f"Theoretical probability max 3: {binom.cdf(3, num_products, prob_big_defect):.2f}")
+print(f"Theoretical probability exactly 10: {binom.pmf(10, num_products, prob_big_defect):.2f}")
+print(f"Theoretical probability min 4: {1 - binom.cdf(3, num_products, prob_big_defect):.2f}")
+-------------------------------------EX3----------------------------------------------
+# Die Lebensdauer eines elektronischen Gerätes werde als normalverteilt angenommen. Der Erwartungswert
+# betrage 10000 Stunden, und die Standardabweichung 200 Stunden.
+# Zufallsgröße X = die Lebensdauer des elektronischen Gerätes.
+from scipy.stats import norm
+
+mu = 10000  # Erwartungswert
+sigma = 200  # Standardabweichung
+n = 10  # Anzahl der simulierten Werte
+
+# a) Simuliere N=10 mögliche Werte von X.
+x = norm.rvs(mu, sigma, n)
+print(x)
+
+# b) Wie groß ist die theoretische Wahrscheinlichkeit, dass ein zufällig der Produktion entnommenes
+print(f"Probability of more than 1500 hours: {sum(x > 1500) / n}")
+print(f"Probability of max than 6500 hours: {sum(x <= 6500) / n}")
+print(f"Probability of between 7500 and 10500 hours: {sum((x > 7500) & (x <= 10500)) / n}")
+-------------------------------------EX4----------------------------------------------
+import numpy as np
+
+data = [309, 333, 309, 330, 325, 325, 325, 333, 314, 314, 330, 314, 314, 330]
+
+print(f"a) Average lifetime of the bulbs: {np.mean(data):.2f}")
+print(f"b) Empirical standard deviation: {np.std(data):.2f}")
+print(f"c) Probability lifetime > 310: {np.sum(np.array(data) > 310) / len(data):.2f}")
+-------------------------------------EX5----------------------------------------------
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Stichprobenvariablen in Histogrammen dargestellt: für die im Vektor X gegebenen Daten zeichne man das
+# Histogramm der absoluten, bzw. relativen Häufigkeiten. Man gebe an P(X<301).
+
+x = [299, 299, 297, 303, 299, 301, 300, 297, 302, 303, 300, 299, 301, 302, 301, 299, 300, 297, 300, 300, 296, 303, 295,
+     295, 297]
+
+# a) Histogramm der absoluten Häufigkeiten
+plt.hist(x, bins=range(min(x), max(x) + 1))
+plt.show()
+
+# b) Histogramm der relativen Häufigkeiten
+plt.hist(x, bins=range(min(x), max(x) + 1), density=True)
+plt.show()
+
+# c) P(X<301)
+print(f"P(X<301) = {np.sum(np.array(x) < 301) / len(x)}")
+-------------------------------------EX6----------------------------------------------
+# Eine Maschine produziert im Mittel 10mm lange Schrauben mit einer Standardabweichung von 1mm. Die
+# Länge der Schrauben kann als normalverteilt angesehen werden. Anhand von (a) Simulationen (b) spezifischen
+# Anweisungen berechne man die geschätzte bzw. theoretische Wahrscheinlichkeit dafür, dass
+# • eine Schraube kürzer ist als 9 mm;
+# • eine Schraube höchstens 10.1 mm und mindestens 8.9 mm lang ist;
+import numpy as np
+from scipy.stats import norm
+
+mu = 10
+sigma = 1
+simulations = 1000
+data = norm.rvs(mu, sigma, simulations)
+
+print(f"Probability shorter than 9mm (Simulations): {np.mean(np.array(data < 9)):.2f}")
+print(f"Probability between 10.1mm and 8.9 (Simulations): "
+      f"{np.mean(np.array(data < 10.1) & np.array(data > 8.9)):.2f}")
+print(f"Probability shorter than 9mm (Theoretical): {norm.cdf(9, loc=mu, scale=sigma):.2f}")
+print(f"Probability between 10.1mm and 8.9 (Theoretical): "
+      f"{norm.cdf(10.1, loc=mu, scale=sigma) - norm.cdf(8.9, loc=mu, scale=sigma):.2f}")
+-------------------------------------EX7----------------------------------------------
+# Man wählt zufällig Punkte im Inneren des Quadrats [0,2]x[0,2] (siehe das untere Bild). Man schätze durch
+# Simulationen die Wahrscheinlichkeit, dass diese Punkte innerhalb des weißen Dreieckes sind. Man zeichne die
+# Punkte im Inneren des weißen Dreiecks mit einer anderen Farben als die Punkte ausserhalb dieses Dreiecks. Welche
+# ist die exakte (theoretische) Wahrscheinlichkeit? (Hinweis: man benutze die geometrische Wahrscheinlichkeit und
+# man berechne die zugehörigen Flächeninhalte!)
+
+from matplotlib.pyplot import axis, plot, figure, show
+from numpy import random
+
+num_simulations = 100
+
+fig = figure()
+axis((0, 2, 0, 2))
+x = random.random(num_simulations) * 2
+y = random.random(num_simulations) * 2
+
+# Plot points
+num_inside = 0
+for i in range(len(x)):
+    if x[i] <= y[i]:
+        plot(x[i], y[i], "bo")
+        num_inside += 1
+    else:
+        plot(x[i], y[i], "ro")
+
+show()
+
+print(f"Probability simulations {num_inside / num_simulations:.2f}")
+
+area_triangle = 2 * 2 / 2
+area_square = 2 * 2
+print(f"Theoretical probability: {area_triangle / area_square}")
+-------------------------------------EX8----------------------------------------------
+# Seien n=4, p=0.25, X~Bino(n,p), Y=X^2 + 1. Man simuliere 1000 Werte für Y. Man erstelle das Histogramm
+# der absoluten Häufigkeiten für Y. Man schätze P(Y>5). Man vergleiche die geschätzte Wahrscheinlichkeit mit der
+# theoretischen Wahrscheinlichkeit.
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import binom
+
+n = 4
+p = 0.25
+sims = 1000
+y = np.random.binomial(n, p, sims) ** 2 + 1
+
+plt.hist(y, bins=range(min(y), max(y) + 1), edgecolor='black')
+plt.show()
+
+print(f"P(y > 5): {np.sum(y > 5) / sims}")
+print(f"Theoretical: {1 - binom.cdf(5, n**2, p):.2f}")
+-------------------------------------EX9----------------------------------------------
+# In einem Programm werden unabhängig voneinander 500 standardnormalverteilte Zufallsvariablen erzeugt
+# und aufsummiert. Man schätze die Wahrscheinlichkeit dafür, dass die Summe der erzeugten Zufallsvariablen
+# außerhalb des Intervalls [−20, 10] liegt. Man vergleiche das Ergebnis mit der theoretischen Wahrscheinlichkeit
+# (Man benutze Octavebefehle für die Normalverteilung!).
+# Hinweis: X1,...,X500 ~N(0,1) unabhängige ZG ⇒ X1+...+X500 ~N(0,500)
+
+import numpy as np
+from scipy.stats import norm
+
+# Anzahl der Zufallsvariablen
+n = 500
+simulations = 1000
+
+# Simuliere 1000 Summen von standardnormalverteilten Zufallsvariablen
+simulated_sums = np.sum(np.random.randn(n, simulations), axis=0)
+
+print(f'Probability outside intervall (Simulations): {np.mean((simulated_sums < -20) | (simulated_sums > 10)):.4f}')
+-------------------------------------EX10----------------------------------------------
+import numpy as np
+from scipy.stats import norm
+
+# Die Zufallsvariable X sei normalverteilt mit Erwartungswert gleich 3 und Varianz gleich 4.
+# Man schätze P(|X| > 4) anhand von
+
+x = 3  # Erwartungswert
+v = 4  # Varianz
+n = 1000  # Anzahl der Simulationen
+
+# (a) Simulationen
+x = np.random.normal(x, np.sqrt(v), n)
+print("P(|x| > 4) = ", np.mean(np.abs(x) > 4))
+
+# (b) spezifischen Anweisungen der Normalverteilung.
+print("P(|x| > 4) = ", 2 * (1 - norm.cdf(4, x, np.sqrt(v))))
+-------------------------------------EX11----------------------------------------------
+# In einer Urne befinden sich 6 rote, 4 weiße und 10 blaue Kugeln. Es werden vier Kugeln gezogen. Wie groß
+# ist die Wahrscheinlichkeit, die Kugeln in der Reihenfolge „rot, weiß, blau, blau" zu ziehen, wenn die Kugeln nach
+# der Ziehung
+# a) zurückgelegt b) nicht zurückgelegt werden?
+# Man beantworte die Fragen anhand von Simulationen; welche sind die entsprechenden theoretischen
+# Wahrscheinlichkeiten?
+import random
+
+import numpy as np
+
+num_sims = 1000
+correct_count = 0
+for _ in range(num_sims):
+    data = random.sample(["red", "white", "blue"], counts=[6, 4, 10], k=4)
+    correct_count += 1 if data == ["red", "white", "blue", "blue"] else 0
+print(f"Probability without replacement: {correct_count / num_sims}")
+
+correct_count = 0
+for _ in range(num_sims):
+    data = random.choices(["red", "white", "blue"], weights=[6, 4, 10], k=4)
+    correct_count += 1 if data == ["red", "white", "blue", "blue"] else 0
+print(f"Probability with replacement: {correct_count / num_sims}")
+
+print(f"Theoretical probability without replacement: {6 / 20 * 4 / 19 * 10 / 18 * 9 / 17:.2f}")
+print(f"Theoretical probability with replacement: {6 / 20 * 4 / 20 * 10 / 20 * 10 / 20:.2f}")
+-------------------------------------EX12----------------------------------------------
+# Ein sechsseitiger Würfel wird auf vier Seiten mit einer 1 und auf zwei Seiten mit einer 2 übermalt. Er wird
+# zweimal geworfen.
+# 1) Die Zufallsvariable X gibt die Summe der erhaltenen Zahlen an. Man gebe alle möglichen Werte von X an und
+# die entsprechenden theoretischen Wahrscheinlichkeiten.
+# 2) Anhand von Simulationen schätze man
+# 2a) die zu erwartende Summe (d.h. E(X)) ; 2b) die Wahrscheinlichkeit dafür, dass die Summe größer als 2 ist.
+import random
+
+num_sims = 1000
+sum_2 = 0
+sum_3 = 0
+sum_4 = 0
+for _ in range(num_sims):
+    data = random.choices([1, 2], weights=[4/6, 2/6], k=2)
+    if sum(data) == 2:
+        sum_2 += 1
+    elif sum(data) == 3:
+        sum_3 += 1
+    elif sum(data) == 4:
+        sum_4 += 1
+
+print(f"Summe 2: {sum_2/num_sims}")
+print(f"Summe 3: {sum_3/num_sims}")
+print(f"Summe 4: {sum_4/num_sims}")
+print(f"Theoretische Wahrscheinlichkeit Summe 2:", 4/6 * 4/6)
+print(f"Theoretische Wahrscheinlichkeit Summe 3:", 4/6 * 2/6 + 2/6 * 4/6)
+print(f"Theoretische Wahrscheinlichkeit Summe 4:", 2/6 * 2/6)
+-------------------------------------EX13----------------------------------------------
+# Man wählt zufällige Punkte innerhalb des blauen Quadrates.
+# Man schätze durch Simulationen die Wahrscheinlichkeit, dass dieser Punkt
+# ausserhalb des Kreises mit Zentrum in (0,0) und
+# Radius 1 ist (siehe Abbildung).
+import math
+import random
+
+num_simulations = 100
+inside_circle = 0
+for _ in range(num_simulations):
+    x = random.randint(0, 2)
+    y = random.randint(0, 2)
+    dist = math.dist((0, 0), (x, y))
+    if dist <= 1:
+        inside_circle += 1
+print("Probability simulations:", inside_circle / num_simulations)
+
+area_circle = math.pi * 1 ** 2 / 4
+area_square = 2 * 2
+print("Theoretical probability:", area_circle / area_square)
+-------------------------------------EX14----------------------------------------------
+# Man schätze anhand von Simulationen die Wahrscheinlichkeit, dass man in einem Lottospiel (mit Zahlen
+# von 1 bis 49, 6 Zahlen werden ohne Zurücklegen gezogen) genau 2 Zahlen richtig erratet.
+import random
+
+num_sims = 10000
+count = 0
+correct_numbers = random.sample(range(1, 50), k=6)
+for _ in range(num_sims):
+    numbers = random.sample(range(1, 50), k=2)
+    if numbers[0] in correct_numbers and numbers[1] in correct_numbers:
+        count += 1
+print(f"Probability: {count / num_sims}")
+-------------------------------------EX15----------------------------------------------
+# Man würfelt mit einem Würfel so lange bis das erste Mal die 6 auftaucht. Anhand von Simulationen
+# schätze man: wie oft muss man im Mittel (durchschnittlich) würfeln bevor erstmals die 6 auftaucht?
+import random
+
+num_sims = 10000
+total_rolls = 0
+for _ in range(num_sims):
+    tries = 1
+    current = random.randint(1, 6)
+    while current != 6:
+        tries += 1
+        current = random.randint(1, 6)
+    total_rolls += tries
+print("Durchschnittliche Anzahl an Würfen:", total_rolls / num_sims)
+-------------------------------------EX16----------------------------------------------
+# Sei X eine binomialverteile Zufallsgröße mit Parametern n=10, p=0.3. Man simuliere 1000 zufällige
+# Werte für X. Man schätze a) die Wahrscheinlichkeit, dass P(3< X< 7) ; b) den Erwartungswert von X; c) die
+# Varianz von X. Man vergleiche die erhaltenen Ergebnisse mit den theoretischen Werten.
+
+import numpy as np
+from scipy.stats import binom
+
+n = 10
+p = 0.3
+sims = 1000
+
+x = np.random.binomial(n, p, sims)
+
+print("a) P(3 < X < 7) = ", np.sum((x > 3) & (x < 7)) / sims)
+print("b) E(X) = ", np.mean(x))
+print("c) Var(X) = ", np.var(x))
+
+print("Theoretical P(3 < X < 7) =", binom.cdf(6, n, p) - binom.cdf(2, n, p))
+print("Theoretical E(X) =", n * p)
+print("Theoretical Var(X) =", n * p * (1 - p))
+-------------------------------------EX17----------------------------------------------
+total_umfragen = 500
+candidateA_chance = 0.46
+simulations = 1000
+votes_required = 235
+count = 0
+
+
+def simulation_surveys():
+    return sum(random.random() < candidateA_chance for _ in range(total_umfragen))
+
+for _ in range(simulations):
+    votesA = simulation_surveys()
+    if votesA > votes_required:
+        count += 1
+
+probability = count / simulations
+
+print(probability)
+-------------------------------------EX18----------------------------------------------
+import numpy as np
+from scipy.stats import norm
+
+durchschnitt = 60
+standardabweichung = 5
+simulations = 1000
+niederschlagsmenge = 55
+
+x = np.random.normal(durchschnitt, standardabweichung, simulations)
+
+estimated_prob = np.mean(x > niederschlagsmenge)
+
+theoretical_prob = 1 - norm.cdf(niederschlagsmenge, durchschnitt, standardabweichung)
+
+print(f"Estimated: {estimated_prob}")
+print(f"Theoretical: {theoretical_prob}")
+-------------------------------------EX19----------------------------------------------
+import random
+import numpy as np
+
+playerA_win_prob=0.6
+playB_win_prob = 1 - playerA_win_prob
+simulations = 2000
+games_to_win = 3
+
+playerA_wins = 0
+playerB_wins = 0
+
+for _ in range(simulations):
+    games_played = 0
+    playerA_score = 0
+    playerB_score = 0
+
+    while True:
+        outcome = random.random()
+        if outcome <= playerA_win_prob:
+            playerA_score += 1
+        else:
+            playerB_score += 1
+
+        games_played += 1
+
+        if playerA_score == games_to_win:
+            playerA_wins += 1
+            break
+        elif playerB_score == games_to_win:
+            playerB_wins += 1
+            break
+
+prob_A_win = playerA_wins / simulations
+prob_B_win = playerB_wins / simulations
+
+print(prob_A_win)
+print(prob_B_win)
+-------------------------------------EX20----------------------------------------------
+import numpy as np
+import random
+print("DoDoo shark was here")
+
+simulation = 1000
+spins = 4
+win = 1
+probability = 1/4
+
+def spin():
+    return random.randint(1, 4) == 1 # zicem ca daca pica 1 ai castigat
+
+sim_wins = [sum(spin() for _ in range(spins)) >= win for _ in range(simulation)]
+
+est_prob = np.mean(sim_wins)
+
+print(f"Simulated Wins: {est_prob}")
+
+from scipy.stats import binom
+
+winning_probability = 1 / 4  # The probability of winning in a single spin
+total_spins = 4
+
+theoretical_probabilities = []
+for k in range(total_spins + 1):
+    probability = binom.pmf(k, total_spins, winning_probability)
+    theoretical_probabilities.append((k, probability))
+
+for k, probability in theoretical_probabilities:
+    print(f"P(X = {k}) = {probability:.4f}")
+
+# probability = 1 - binom.pmf(1, total_spins, winning_probability)
+# print(probability)
+-------------------------------------EX21----------------------------------------------
+import math
+import random
+
+success_prob = 0.85
+simulations = 1000
+misses = 0
+
+for _ in range(simulations):
+    attempts = random.choices([0, 1], [1 - success_prob, success_prob], k=3)
+    if 0 in attempts:
+        misses += 1
+
+estimated_prob = misses / simulations
+print("Estimated prob:", estimated_prob)
+
+print(f"Theoretical : {1 - math.pow(0.85, 3):.2f}")
+-------------------------------------EX23----------------------------------------------
+# In einer Lostrommel sind 10 Gewinnlose und 30 Nieten. Wie groß ist die Wahrscheinlichkeit, man bei dreimaligem Ziehen
+# a) mindestens ein Gewinnlos zieht? b) nur Nieten zieht?
+# Welche ist die theoretische Wahrscheinlichkeitsverteilung der Zufallsgröße X: Anzahl der Gewinnlose beim dreimaligen
+# Ziehen?
+
+import math
+
+# Total number of items in the drum
+total_items = 40
+# Number of winning items in the drum
+winning_items = 10
+# Number of draws
+num_draws = 3
+
+# Calculate the probability of getting at least one winning item
+prob_at_least_one_win = 1 - (math.comb(30, 3) / math.comb(40, 3))
+
+# Calculate the probability of getting all non-winning items (only Nieten)
+prob_all_losers = (math.comb(30, 3) / math.comb(40, 3))
+
+print("a) Probability of getting at least one Gewinnlos:", prob_at_least_one_win)
+print("b) Probability of getting only Nieten (non-winning items):", prob_all_losers)
+
+# Theoretical probability distribution of X (number of Gewinnlose in 3 draws)
+theoretical_distribution = []
+for k in range(4):  # Possible values of X (0, 1, 2, 3)
+    prob = (math.comb(10, k) * math.comb(30, 3 - k)) / math.comb(40, 3)
+    theoretical_distribution.append((k, prob))
+
+print("c) Theoretical probability distribution of X:")
+for k, probability in theoretical_distribution:
+    print(f"P(X = {k}) = {probability:.4f}")
+-------------------------------------EX24----------------------------------------------
+# Tom schießt auf eine Zielscheibe, und die Wahrscheinlichkeit, mit der sein Schuss die Zielscheibe trifft,
+# beträgt p=0.3 (leider ist Tom kein geübter Schütze). Er möchte die Wahrscheinlichkeit für die Anzahl X der
+# Schüsse wissen, bis (inklusiv) er zum ersten Mal die Zielscheibe trifft.
+# (1) Man zeichne das Histogramm der absoluten Häufigkeiten für die Zufallsgröße X.
+# (2) Man bestimme wie viele Schüsse durchschnittlich geschossen werden bis Tom die Zielscheibe trifft.
+# (3) Man schätze P(X<5) und vergleiche diese mit der theoretischen Wahrscheinlichkeit.
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Wahrscheinlichkeit, die Zielscheibe zu treffen
+p = 0.3
+simulations = 1000  # Anzahl der Simulationen
+
+shots_to_hit = []
+
+for i in range(simulations):
+    shots = 1
+    while np.random.rand() > p:
+        shots += 1
+    shots_to_hit.append(shots)
+
+# print(shots_to_hit)
+
+plt.hist(shots_to_hit, bins=max(shots_to_hit), align='mid', rwidth=0.8)
+plt.title("Histogramm der Anzahl der Schüsse bis zum Treffer")
+plt.xlabel("Anzahl der Schüsse")
+plt.ylabel("Absolute Häufigkeit")
+plt.show()
+
+average_shots = np.mean(shots_to_hit)
+print(f"Durchschnittliche Anzahl der Schüsse: {average_shots}")
+
+# Schätzung von P(X<5)
+probability_less_than_5 = np.sum(np.array(shots_to_hit) < 5) / simulations
+print(f"Schätzung von P(X<5): {probability_less_than_5}")
+
+# Theoretische Wahrscheinlichkeit P(X<5)
+theoretical_probability_less_than_5 = sum([(1-p)**(x-1) * p for x in range(1, 5)])
+print(f"Theoretische Wahrscheinlichkeit P(X<5): {theoretical_probability_less_than_5}")
+print("I like chicken nuggets")
